@@ -12,5 +12,5 @@ Nearly every downturn in this game has an equal and opposite check, or at least 
 
 Source code
 Thomas Knox ported this game (with permission) from George Blank's original TRS-80 BASIC to ANSI-C in 2000, releasing it under the GNU General Public License; this code was the basis for modern Windows, OSX and Linux releases of this game and can be read or downloaded here.
-
+Steven Garbeil ported this game to c++11 to add graphics and features. 
 

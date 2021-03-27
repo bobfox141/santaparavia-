@@ -112,7 +112,7 @@ void Paravia::InitializePlayer(player *Me, int year, int city, int level, char *
 void Paravia::AddRevenue(player *Me) {
     Me->Treasury += (Me->JusticeRevenue + Me->CustomsDutyRevenue);
     Me->Treasury += (Me->IncomeTaxRevenue + Me->SalesTaxRevenue);
-    /* Penalize deficit spending. */
+    /* Penalize deficit spending. A fifty percent interest rate? WTF? */
     if (Me->Treasury < 0) Me->Treasury = (int)((float)Me->Treasury * 1.5);
     /* Will a title make the creditors happy (for now)? */
     if (Me->Treasury < (-10000 * Me->TitleNum)) Me->IsBankrupt = True;
@@ -190,13 +190,19 @@ void Paravia::BuyPalace(player *Me) {
     Me->PublicWorks += 0.5;
     return;
 }
+
+// The actual outfitting of 20 serfs as soldiers, which is a really good deal for them.
+// They get fed first. 
 void Paravia::BuySoldiers(player *Me) {
     Me->Soldiers += 20;
     Me->Serfs -= 20;
     Me->Treasury -= 500;
 }
+
+// limits 10 somethings. 
 int Paravia::limit10(int num, int denom) {
-    register int val;
+    // register removed. no purpose in a computer built past 1985
+    int val;
     val = num / denom;
     return(val > 10 ? 10 : val);
 }
@@ -711,14 +717,15 @@ void Paravia::StatePurchases(player *Me, int HowMany, player MyPlayers[6]) {
     return;
 }
 void Paravia::ShowStats(player MyPlayers[6], int HowMany) {
-    int i = 0;
-    char string[256];
-    printf("Nobles\tSoldiers\tClergy\tMerchants\tSerfs\tLand\tTreasury\n");
-    for (;
-            i < HowMany;
-            i++) printf("\n%s %s\n%d\t%d\t\t%d\t%d\t\t%d\t%d\t%d\n", MyPlayers[i].Title, MyPlayers[i].Name, MyPlayers[i].Nobles, MyPlayers[i].Soldiers, MyPlayers[i].Clergy, MyPlayers[i].Merchants, MyPlayers[i].Serfs, MyPlayers[i].Land, MyPlayers[i].Treasury);
+    
+  
+    sprintf(stath, "Nobles\tSoldiers\tClergy\tMerchants\tSerfs\tLand\tTreasury\n");
+    // omg this has got to freaking go. smg. 
+    const char statf[256] = "\n%s %s\n%d\t%d\t\t%d\t%d\t\t%d\t%d\t%d\n";
+    for (int i = 0; i < HowMany; i++)
+        sprintf(statl, statf, MyPlayers[i].Title, MyPlayers[i].Name, MyPlayers[i].Nobles, MyPlayers[i].Soldiers, MyPlayers[i].Clergy, MyPlayers[i].Merchants, MyPlayers[i].Serfs, MyPlayers[i].Land, MyPlayers[i].Treasury);
     printf("\n(Press ENTER): ");
-    fgets(string, 255, stdin);
+    fgets(str, 255, stdin);
     return;
 }
 void Paravia::ImDead(player *Me) {

@@ -13,7 +13,12 @@
 
 class Paravia {
 public: 
-    /* Our prototypes. */
+    
+    char str[256];            // generic message string 
+    char stath[256];          // stats header
+    char statl[256];          // stats line. 
+    
+    // methods
     int Random(int);
     void InitializePlayer(player*, int, int, int, char*, boolean);
     void AddRevenue(player *);

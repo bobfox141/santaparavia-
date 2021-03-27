@@ -1,17 +1,17 @@
 // ncurses.cpp
 
-#include <ncurses.h>
-#include <unistd.h>
-
-#include "ncurses-demo.h"
 
 
-ncurses_demo::ncurses_demo() {
+#include "ncurses-screen.h"
+
+
+
+ncurses_screen::ncurses_screen() {
     direction = 1;
     max_y = 0;
     max_y = 0;
 }
-void ncurses_demo::ncurses_init() {
+void ncurses_screen::ncurses_init() {
     initscr();
     noecho();
     curs_set(FALSE);
@@ -19,12 +19,12 @@ void ncurses_demo::ncurses_init() {
     
 }
 
-void ncurses_demo::ncurses_end() {
+void ncurses_screen::ncurses_end() {
     sleep(1);
     endwin();
 }
 
-int ncurses_demo::toggle_direction() {
+int ncurses_screen::toggle_direction() {
     if (direction == 1)
         return -1;
     else 
@@ -33,7 +33,7 @@ int ncurses_demo::toggle_direction() {
 
 
 
-void ncurses_demo::ncurses_mvball() {
+void ncurses_screen::ncurses_mvball() {
     const int DELAY = 30000;
     getmaxyx(stdscr,max_y,max_x);
     int x = 1;

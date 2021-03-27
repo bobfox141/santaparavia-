@@ -1,3 +1,6 @@
+# file: CMakeLists.txt 
+# description: I'd like to teach the world to sing in perfect compile form.
+
 cmake_minimum_required(VERSION 3.10)  # CMake version check
 project(santaparavia CXX)             # Create project "santaparavia"
 set(CMAKE_CXX_STANDARD 11)            # Enable c++11 standard
@@ -21,5 +24,5 @@ set( source
     )
 
 add_executable(santaparavia ${source} ${headers})
-
+target_link_libraries(santaparavia ncurses)
 
