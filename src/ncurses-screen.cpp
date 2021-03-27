@@ -49,3 +49,12 @@ void ncurses_screen::ncurses_mvball() {
         x += direction;
         }
 }
+
+
+void ncurses_screen::sp_write_status(int nobles, int soldiers, int clergy, int merchants, int serfs, int land, int treasury) {
+    
+    return;
+}
+void ncurses_screen::sp_write_grain(int reserve, int harvest, int grainmin, int grainmax) {
+    return;
+}

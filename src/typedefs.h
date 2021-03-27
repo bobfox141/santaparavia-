@@ -1,7 +1,8 @@
-/*
-file: typedefs.h
-description: typedefs to be included in all files. 
-*/
+// file: typedefs.h
+// description: typedefs to be included in all files. 
+// -*- mode: c++; linum:on ; -*-
+
+
 
 #ifndef TYPEDEF_H
 #define TYPEDEF_H
@@ -36,7 +37,9 @@ const char MaleTitles[8][15] = {
 };
 /* Declare our female titles. */
 const char FemaleTitles[8][15] = {
-    "Lady", "Baroness", "Countess",
+    "Lady",
+    "Baroness",
+    "Countess",
     "Marquise",
     "Duchess",
     "Grand Duchess",

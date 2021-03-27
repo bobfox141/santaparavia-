@@ -721,9 +721,12 @@ void Paravia::ShowStats(player MyPlayers[6], int HowMany) {
   
     sprintf(stath, "Nobles\tSoldiers\tClergy\tMerchants\tSerfs\tLand\tTreasury\n");
     // omg this has got to freaking go. smg. 
-    const char statf[256] = "\n%s %s\n%d\t%d\t\t%d\t%d\t\t%d\t%d\t%d\n";
-    for (int i = 0; i < HowMany; i++)
+    const char statf[256] = "%s %s\n%d\t%d\t\t%d\t%d\t\t%d\t%d\t%d\n";
+    printf("%s", stath);
+    for (int i = 0; i < HowMany; i++) {
         sprintf(statl, statf, MyPlayers[i].Title, MyPlayers[i].Name, MyPlayers[i].Nobles, MyPlayers[i].Soldiers, MyPlayers[i].Clergy, MyPlayers[i].Merchants, MyPlayers[i].Serfs, MyPlayers[i].Land, MyPlayers[i].Treasury);
+        printf("%s", statl);
+    }
     printf("\n(Press ENTER): ");
     fgets(str, 255, stdin);
     return;
