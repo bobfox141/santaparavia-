@@ -534,6 +534,9 @@ void Paravia::PrintInstructions(void) {
     printf("grain, some of your people will starve, and you will have\n");
     printf("a high death rate. High taxes raise money, but slow down\n");
     printf("economic growth. (Press ENTER to begin game)\n");
+    printf("Add text notifications if the serf counts or soldier count is ");
+    printf("too low, as well as status of the treasury.");
+    printf("Currently the graphics are not implemented. Second thing to do.");
     fgets(string, 255, stdin);
     return;
 }
