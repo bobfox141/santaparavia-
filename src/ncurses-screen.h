@@ -29,6 +29,8 @@ public:
    // game functions 
    void sp_write_status(int nobles, int soldiers, int clergy, int merchants, int serfs, int land, int treasury);
    void sp_write_grain(int reserve, int harvest, int grainmin, int grainmax);
+   void sp_state_purchases();
+   
 };
 
 

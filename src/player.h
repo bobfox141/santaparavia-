@@ -17,9 +17,10 @@ public:
     int DeadSerfs;
     int Difficulty;
     int FleeingSerfs;
+    int Granaries;   // reduce losses by 5-10% 
     int GrainDemand;
     int GrainPrice;
-    int GrainReserve;
+    int GrainReserve; // this is an integer because stupid. 
     int Harvest;
     int IncomeTax;
     int IncomeTaxRevenue;

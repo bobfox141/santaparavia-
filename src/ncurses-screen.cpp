@@ -58,3 +58,8 @@ void ncurses_screen::sp_write_status(int nobles, int soldiers, int clergy, int m
 void ncurses_screen::sp_write_grain(int reserve, int harvest, int grainmin, int grainmax) {
     return;
 }
+
+void ncurses_screen::sp_state_purchases() {
+    return;
+}
+

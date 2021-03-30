@@ -51,18 +51,33 @@
 #include <time.h>
 #include <stdlib.h>
 #include <curses.h> 
+#include <math.h>
 #include "player.h"
 #include "paravia.h"
 
+using std::round;
 
+// constructor
+Paravia::Paravia():
+magicsoldierratio(2.4)
+{
+    curses_on = false;
+    n = new ncurses_screen();
+    
+    
+}
 
+Paravia::~Paravia() {
+    // empty destructor;
+}
 
 
 /******************************************************************************
  ** This function will take a parameter Hi and return a random integer**
- ** between 0 and Hi.**
+ ** between 0 and Hi.** note: this is a pretty crap function. suggest replace with 
+ *  random distribution, maybe even a couple. A normal distribution for crops, 
+ * and a uniform distribution for things like dying. 
  ******************************************************************************/
-
 int Paravia::Random(int Hi) {
     float RanNum;
     RanNum = (float)rand();
@@ -72,7 +87,7 @@ int Paravia::Random(int Hi) {
 }
 
 void Paravia::InitializePlayer(player *Me, int year, int city, int level, char *name, boolean MorF) {
-    /* This is pretty straightforward. */
+    /* This is pretty straightforward.  Might be better to do this with a constructor */
     Me->Cathedral = 0;
     strcpy(Me->City, CityList[city]);
     Me->Clergy = 5;
@@ -199,6 +214,13 @@ void Paravia::BuySoldiers(player *Me) {
     Me->Treasury -= 500;
 }
 
+
+void Paravia::BuyGranary(player *Me) {
+    Me->Granaries += 1;
+    Me->Treasury -= 1000;
+    Me->PublicWorks += 1.0;
+    return;
+}
 // limits 10 somethings. 
 int Paravia::limit10(int num, int denom) {
     // register removed. no purpose in a computer built past 1985
@@ -234,10 +256,25 @@ boolean Paravia::CheckNewTitle(player *Me) {
     Me->TitleNum = Me->OldTitle;
     return(False);
 }
+
+// figure out GrainReserve without the stupid * 100 bullshit way of dealing with percentages without 
+// floats or doubles. Instead, i'm going to use it to do a cheapo crappy storage loss reduction.
+int Paravia::calcGrainReserve( int g, int r, int s) {
+    int upG = g * 100; // upScale the Reserve
+    int upR = r * 100; // upScale the Rats
+    int upS = s * 100; // upScale the Grainaries
+    double res = upG - upR + upS;
+    res = round(res/100);
+    return (int)(res);
+
+}
+
+// I think implementing Graineries would be a fun choice. 
+// 
 void Paravia::GenerateHarvest(player *Me) {
-    Me->Harvest = (Random(5) + Random(6)) / 2;
+    Me->Harvest = (Random(5) + Random(6)) / 2; // this is the same as the original 
     Me->Rats = Random(50);
-    Me->GrainReserve = ((Me->GrainReserve * 100) - (Me->GrainReserve * Me->Rats)) / 100;
+    Me->GrainReserve = calcGrainReserve(Me->GrainReserve, Me->Rats, Me->Granaries);
     return;
 }
 void Paravia::GenerateIncome(player *Me) {
@@ -318,6 +355,9 @@ void Paravia::NewLandAndGrainPrices(player *Me) {
     Me->RatsAte = h;
     return;
 }
+
+// this means there is a 2/5 chance of drought. not cool. 
+// 
 void Paravia::PrintGrain(player *Me) {
     switch (Me->Harvest) {
     case 0: /* intentional fallthrough */
@@ -380,7 +420,7 @@ int Paravia::ReleaseGrain(player *Me) {
     zp /= 10.0;
     if (zp > 0.0) zp += (3.0 - (double)Me->Justice);
     z += ((float)zp / 10.0);
-    if (z > 0.5) z = 0.5;
+    if (z > 0.5) z = 0.5; 
     if (HowMuch < (Me->GrainDemand - 1)) {
         x = ((float)Me->GrainDemand - (float)HowMuch) / (float)Me->GrainDemand * 100.0 - 9.0;
         xp = (double)x;
@@ -391,7 +431,8 @@ int Paravia::ReleaseGrain(player *Me) {
         }
         SerfsProcreating(Me, 3.0);
         SerfsDecomposing(Me, xp + 8.0);
-    } else {
+    } 
+    else { // if you release more grain than demand. 
         SerfsProcreating(Me, 7.0);
         SerfsDecomposing(Me, 3.0);
         if ((Me->CustomsDuty + Me->SalesTax) < 35) Me->Merchants += Random(4);
@@ -451,6 +492,8 @@ int Paravia::ReleaseGrain(player *Me) {
     }
     return(0);
 }
+
+
 void Paravia::SeizeAssets(player *Me) {
     char string[256];
     Me->Marketplaces = 0;
@@ -495,6 +538,8 @@ void Paravia::SellLand(player *Me) {
     Me->Treasury += (int)(((float)HowMuch * Me->LandPrice));
     return;
 }
+
+
 void Paravia::SerfsDecomposing(player *Me, float MyScale) {
     int absc;
     float ord;
@@ -505,6 +550,7 @@ void Paravia::SerfsDecomposing(player *Me, float MyScale) {
     printf("%d serfs die this year.\n", Me->DeadSerfs);
     return;
 }
+
 void Paravia::SerfsProcreating(player *Me, float MyScale) {
     int absc;
     float ord;
@@ -540,27 +586,28 @@ void Paravia::PrintInstructions(void) {
     fgets(string, 255, stdin);
     return;
 }
+
+// this is the main game loop 
 void Paravia::PlayGame(player MyPlayers[6], int NumOfPlayers) {
     boolean AllDead, Winner;
-    int i, WinningPlayer = 0;
+    int WinningPlayer = 0;
     player Baron;
     AllDead = False;
     Winner = False;
     char q[] = "Peppone";
     InitializePlayer(&Baron, 1400, 6, 4, q, True);
+    
+    // begin the main game loop. I normally don't do it this way, but 
+    // not necessary to fix right now. 
     while (AllDead == False && Winner == False) {
-        for (i = 0;
-                i < NumOfPlayers;
-                i++)
+        for (int i = 0;  i < NumOfPlayers;   i++) {
             if (MyPlayers[i].IsDead == False) NewTurn(&MyPlayers[i], NumOfPlayers, MyPlayers, &Baron);
+        }
         AllDead = True;
-        for (i = 0;
-                i < NumOfPlayers;
-                i++)
+        for (int i = 0; i < NumOfPlayers; i++) {
             if (AllDead == True && MyPlayers[i].IsDead == False) AllDead = False;
-        for (i = 0;
-                i < NumOfPlayers;
-                i++)
+        }
+        for (int i = 0; i < NumOfPlayers; i++)
             if (MyPlayers[i].IWon == True) {
                 Winner = True;
                 WinningPlayer = i;
@@ -573,25 +620,32 @@ void Paravia::PlayGame(player MyPlayers[6], int NumOfPlayers) {
     printf("Game Over. %s %s wins.\n", MyPlayers[WinningPlayer].Title, MyPlayers[WinningPlayer].Name);
     return;
 }
+
+// NewTurn player moves first. 
+// 
 void Paravia::NewTurn(player *Me, int HowMany, player MyPlayers[6], player *Baron) {
-    int i;
+    int ipflag = 0;   // invade player flag
     GenerateHarvest(Me);
     NewLandAndGrainPrices(Me);
     BuySellGrain(Me);
     ReleaseGrain(Me);
-    if (Me->InvadeMe == True) {
-        for (i = 0;
-                i < HowMany;
-                i++)
-            if (i != Me->WhichPlayer)
-                if (MyPlayers[i].Soldiers > (Me->Soldiers * 2.4)) {
-                    AttackNeighbor(&MyPlayers[i], Me);
-                    i = 9;
+    if (Me->InvadeMe == True) {        // if the system meets the requires to invade the player
+        for (int i = 0; i < HowMany; i++) {      // cycle through all the players 
+            if (i != Me->WhichPlayer) {
+                if (MyPlayers[i].Soldiers > (Me->Soldiers * magicsoldierratio)) {   
+                    AttackNeighbor(&MyPlayers[i], Me);  
+                    ipflag = 9;  // setting this to 9 originally would cause the for to fall through so that only one npc can attack.
+                    break;       // break the loop instead.
                 }
-        if (i != 9) AttackNeighbor(Baron, Me);
+            }
+        } 
+        // this logic is messed up no matter how you slice it. it depends on carrying down the loop counter
+        // which is compiler dependent in C and C++ and 
+        if (ipflag != 9) AttackNeighbor(Baron, Me);
     }
     AdjustTax(Me);
     DrawMap(Me);
+    printPurchases(Me, curses_on);   
     StatePurchases(Me, HowMany, MyPlayers);
     CheckNewTitle(Me);
     Me->Year++;
@@ -624,6 +678,9 @@ void Paravia::BuySellGrain(player *Me) {
     }
     return;
 }
+
+
+
 
 void Paravia::AdjustTax(player *Me) {
     char string[256];
@@ -681,20 +738,35 @@ void Paravia::DrawMap(player *Me) {
     /* Not implemented yet. */
     return;
 }
+
+
+// adding Granaries to SP because they need to be there, and because 
+// I need to check my programming skill. Poor. 
+void Paravia::printPurchases(player * Me, bool np) {
+    if (!np) {
+    printf("\n\n%s %s\nState purchases.\n", Me->Title, Me->Name);
+    printf("\n1. Marketplace (%d)\t\t\t\t1000 florins\n", Me->Marketplaces);
+    printf("2. Woolen mill (%d)\t\t\t\t2000 florins\n", Me->Mills);
+    printf("3. Palace (partial) (%d)\t\t\t\t3000 florins\n", Me->Palace);
+    printf("4. Cathedral (partial) (%d)\t\t\t5000 florins\n", Me->Cathedral);
+    printf("5. Equip one platoon of serfs as soldiers\t500 florins\n");
+    printf("6. Build a Granary to reduce losses from Vermin(%d)\t\t\t\t5000 florins\n", Me->Granaries);  
+    printf("7. Show Status");
+    printf("\nYou have %d gold florins.\n", Me->Treasury);
+    printf("\nTo continue, enter q. To compare standings, enter 7.\n");
+    printf("Your choice: ");
+    }
+    else {
+        n->sp_state_purchases();
+    }
+    return;
+}
 void Paravia::StatePurchases(player *Me, int HowMany, player MyPlayers[6]) {
     char string[256];
     int val = 1;
     string[0] = '\0';
     while (val != 0 || string[0] != 'q') {
-        printf("\n\n%s %s\nState purchases.\n", Me->Title, Me->Name);
-        printf("\n1. Marketplace (%d)\t\t\t\t1000 florins\n", Me->Marketplaces);
-        printf("2. Woolen mill (%d)\t\t\t\t2000 florins\n", Me->Mills);
-        printf("3. Palace (partial) (%d)\t\t\t\t3000 florins\n", Me->Palace);
-        printf("4. Cathedral (partial) (%d)\t\t\t5000 florins\n", Me->Cathedral);
-        printf("5. Equip one platoon of serfs as soldiers\t500 florins\n");
-        printf("\nYou have %d gold florins.\n", Me->Treasury);
-        printf("\nTo continue, enter q. To compare standings, enter 6\n");
-        printf("Your choice: ");
+       
         fgets(string, 255, stdin);
         val = (int)atoi(string);
         switch (val) {
@@ -714,6 +786,9 @@ void Paravia::StatePurchases(player *Me, int HowMany, player MyPlayers[6]) {
             BuySoldiers(Me);
             break;
         case 6:
+            BuyGranary(Me);
+            break;
+        case 7:
             ShowStats(MyPlayers, HowMany);
         }
     }
@@ -767,4 +842,9 @@ void Paravia::ImDead(player *Me) {
     printf("\n(Press ENTER): ");
     fgets(string, 255, stdin);
     return;
+}
+
+
+bool Paravia::isDefenseSufficient() {
+    return true;
 }
