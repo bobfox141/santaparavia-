@@ -580,8 +580,8 @@ void Paravia::PrintInstructions(void) {
     printf("grain, some of your people will starve, and you will have\n");
     printf("a high death rate. High taxes raise money, but slow down\n");
     printf("economic growth. (Press ENTER to begin game)\n");
-    printf("Add text notifications if the serf counts or soldier count is ");
-    printf("too low, as well as status of the treasury.");
+    printf("Add text notifications if the serf counts or soldier count is \n");
+    printf("too low, as well as status of the treasury. \n");
     printf("Currently the graphics are not implemented. Second thing to do.");
     fgets(string, 255, stdin);
     return;
@@ -802,7 +802,9 @@ void Paravia::ShowStats(player MyPlayers[6], int HowMany) {
     const char statf[256] = "%s %s\n%d\t%d\t\t%d\t%d\t\t%d\t%d\t%d\n";
     printf("%s", stath);
     for (int i = 0; i < HowMany; i++) {
-        sprintf(statl, statf, MyPlayers[i].Title, MyPlayers[i].Name, MyPlayers[i].Nobles, MyPlayers[i].Soldiers, MyPlayers[i].Clergy, MyPlayers[i].Merchants, MyPlayers[i].Serfs, MyPlayers[i].Land, MyPlayers[i].Treasury);
+        sprintf(statl, statf, MyPlayers[i].Title, MyPlayers[i].Name, MyPlayers[i].Nobles,
+                MyPlayers[i].Soldiers, MyPlayers[i].Clergy, MyPlayers[i].Merchants,
+                MyPlayers[i].Serfs, MyPlayers[i].Land, MyPlayers[i].Treasury);
         printf("%s", statl);
     }
     printf("\n(Press ENTER): ");
