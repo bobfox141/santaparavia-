@@ -1,3 +1,8 @@
+/*
+    gradle kotlin support
+*/
+val debug = false
+val optimized = true
 
 println("Building Santa Paravia with Gradle")
 
@@ -21,6 +26,8 @@ application {
 
 tasks.withType(CppCompile::class.java).configureEach {
     // Define a preprocessor macro for every binary
+    setOptimized(true)
+    setDebuggable(false)
     macros.put("NDEBUG", null)
 
     // Define a compiler options
